@@ -10,21 +10,15 @@ public class Menu {
 	public static void main(String[] args) {
 
 		Scanner leia = new Scanner(System.in);
-		
-		// Instanciando a Controller: ela gerencia a lista (Collection) na memória
 		ProdutoController produtos = new ProdutoController();
 
-		// --- DADOS DE TESTE PARA VALIDAR A LISTAGEM (COLLECTIONS) ---
-		// Cadastramos alguns itens antes do menu iniciar para a lista não vir vazia
-		produtos.cadastrar(new Cosmetico(1, "Perfume Floral", 2, 89.90f, "Lavanda"));
-		produtos.cadastrar(new Cosmetico(2, "Creme Hidratante", 2, 45.00f, "Sem fragrância"));
-		// ------------------------------------------------------------
-
-		int opcao;
+		// Variáveis para receber os dados do usuário (Padrão Conta Bancária)
+		int opcao, id, tipo;
+		String nome, fragrancia;
+		float preco;
 
 		while (true) {
 
-			// Título com Fundo Preto e Letras Ciano
 			System.out.println(Cores.ANSI_BLACK_BACKGROUND + Cores.TEXT_CYAN_BOLD 
 					+ "*****************************************************" + Cores.TEXT_RESET);
 			System.out.println(Cores.ANSI_BLACK_BACKGROUND + Cores.TEXT_CYAN_BOLD 
@@ -32,7 +26,6 @@ public class Menu {
 			System.out.println(Cores.ANSI_BLACK_BACKGROUND + Cores.TEXT_CYAN_BOLD 
 					+ "*****************************************************" + Cores.TEXT_RESET);
 			
-			// Opções em Amarelo para destacar
 			System.out.println(Cores.TEXT_YELLOW_BOLD + "            1 - Cadastrar Produto                    ");
 			System.out.println("            2 - Listar todos os Produtos             ");
 			System.out.println("            3 - Atualizar Produto                    ");
@@ -46,10 +39,9 @@ public class Menu {
 			try {
 				opcao = leia.nextInt();
 			} catch (InputMismatchException e) {
-				// Mensagem de Erro em VERMELHO (Exceptions)
 				System.err.println(Cores.TEXT_RED_BOLD + "\nERRO: Digite apenas números inteiros!" + Cores.TEXT_RESET);
-				leia.nextLine(); // Limpa o erro do teclado
-				opcao = 0; // Reinicia o menu
+				leia.nextLine();
+				opcao = 0;
 			}
 
 			if (opcao == 5) {
@@ -59,14 +51,69 @@ public class Menu {
 			}
 
 			switch (opcao) {
-				case 1 -> System.out.println(Cores.TEXT_WHITE_BOLD + "Cadastrar Produto\n" + Cores.TEXT_RESET);
+				case 1 -> {
+					System.out.println(Cores.TEXT_WHITE_BOLD + "Cadastrar Produto\n" + Cores.TEXT_RESET);
+					
+					System.out.println("Digite o ID do Produto: ");
+					id = leia.nextInt();
+					
+					System.out.println("Digite o Nome do Produto: ");
+					leia.skip("\\R?"); 
+					nome = leia.nextLine();
+					
+					tipo = 2; // Definindo como Cosmético por padrão
+					
+					System.out.println("Digite o Preço: ");
+					preco = leia.nextFloat();
+					
+					System.out.println("Digite a Fragrância: ");
+					leia.skip("\\R?");
+					fragrancia = leia.nextLine();
+					
+					/* CHAMADA DO MÉTODO: Envia o novo objeto para a Collection na Controller */
+					produtos.cadastrar(new Cosmetico(id, nome, tipo, preco, fragrancia));
+				}
 				case 2 -> {
 					System.out.println(Cores.TEXT_WHITE_BOLD + "Listar todos os Produtos\n" + Cores.TEXT_RESET);
-					// Este método percorre o ArrayList e imprime os dados dos itens de teste
+					/* CHAMADA DO MÉTODO: Percorre o ArrayList e mostra os dados */
 					produtos.listarTodos(); 
 				}
-				case 3 -> System.out.println(Cores.TEXT_WHITE_BOLD + "Atualizar Produto\n" + Cores.TEXT_RESET);
-				case 4 -> System.out.println(Cores.TEXT_WHITE_BOLD + "Apagar Produto\n" + Cores.TEXT_RESET);
+				case 3 -> {
+					System.out.println(Cores.TEXT_WHITE_BOLD + "Atualizar Produto\n" + Cores.TEXT_RESET);
+					
+					System.out.println("Digite o ID do produto que deseja atualizar: ");
+					id = leia.nextInt();
+					
+					// Verifica se o produto existe antes de pedir os novos dados
+					if (produtos.buscarNaCollection(id) != null) {
+						
+						System.out.println("Digite o Novo Nome: ");
+						leia.skip("\\R?");
+						nome = leia.nextLine();
+						
+						System.out.println("Digite o Novo Preço: ");
+						preco = leia.nextFloat();
+						
+						System.out.println("Digite a Nova Fragrância: ");
+						leia.skip("\\R?");
+						fragrancia = leia.nextLine();
+						
+						/* CHAMADA DO MÉTODO: Atualiza o item na lista */
+						produtos.atualizar(new Cosmetico(id, nome, 2, preco, fragrancia));
+						
+					} else {
+						System.out.println(Cores.TEXT_RED_BOLD + "\nProduto não encontrado!" + Cores.TEXT_RESET);
+					}
+				}
+				case 4 -> {
+					System.out.println(Cores.TEXT_WHITE_BOLD + "Apagar Produto\n" + Cores.TEXT_RESET);
+					
+					System.out.println("Digite o ID do produto que deseja apagar: ");
+					id = leia.nextInt();
+					
+					/* CHAMADA DO MÉTODO: Remove o item da Collection pelo ID */
+					produtos.deletar(id);
+				}
 				default -> {
 					if (opcao != 0) System.out.println(Cores.TEXT_RED_BOLD + "\nOpção Inválida!\n" + Cores.TEXT_RESET);
 				}
